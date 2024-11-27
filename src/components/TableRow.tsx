@@ -1,4 +1,5 @@
 import React from "react";
+import { MdDeleteForever } from "react-icons/md";
 
 type TableRowProps = {
   title: string;
@@ -34,7 +35,7 @@ function TableRow({
           className="text-red-500 hover:text-red-700"
           aria-label="Delete row"
         >
-          🗑️
+          <MdDeleteForever />
         </button>
       </td>
     </tr>
