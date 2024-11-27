@@ -1,17 +1,21 @@
 import React from "react";
-import { MdDeleteForever } from "react-icons/md";
+import { FaTrash } from "react-icons/fa"; // Import the trash can icon
 
-type TableRowProps = {
+type TableRowData = {
   title: string;
   firstName: string;
   lastName: string;
   email: string;
   city: string;
   hemisphere: string;
-  onDelete: () => void; // New prop for delete action
 };
 
-function TableRow({
+interface TableRowProps extends TableRowData {
+  onDelete: () => void;
+  visibleColumns: string[];
+}
+
+const TableRow: React.FC<TableRowProps> = ({
   title,
   firstName,
   lastName,
@@ -19,26 +23,35 @@ function TableRow({
   city,
   hemisphere,
   onDelete,
-}: TableRowProps): JSX.Element {
+  visibleColumns,
+}) => {
   return (
-    <tr className="hover:bg-gray-100">
-      <td className="p-2 border">{title}</td>
-      <td className="p-2 border">{firstName}</td>
-      <td className="p-2 border">{lastName}</td>
-      <td className="p-2 border">{email}</td>
-      <td className="p-2 border">{city}</td>
-      <td className="p-2 border">{hemisphere}</td>
-      <td className="p-2 border text-center">
-        {/* Delete icon */}
-        <button
-          onClick={onDelete}
-          className="text-red-500 hover:text-red-700"
-          aria-label="Delete row"
-        >
-          <MdDeleteForever />
+    <tr>
+      {visibleColumns.includes("title") && (
+        <td className="p-2 border">{title}</td>
+      )}
+      {visibleColumns.includes("firstName") && (
+        <td className="p-2 border">{firstName}</td>
+      )}
+      {visibleColumns.includes("lastName") && (
+        <td className="p-2 border">{lastName}</td>
+      )}
+      {visibleColumns.includes("email") && (
+        <td className="p-2 border">{email}</td>
+      )}
+      {visibleColumns.includes("city") && (
+        <td className="p-2 border">{city}</td>
+      )}
+      {visibleColumns.includes("hemisphere") && (
+        <td className="p-2 border">{hemisphere}</td>
+      )}
+      <td className="p-2 border">
+        <button className="text-red-500" onClick={onDelete}>
+          <FaTrash />
         </button>
       </td>
     </tr>
   );
-}
+};
+
 export default TableRow;
