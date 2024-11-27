@@ -32,7 +32,10 @@ function Table({ data }: TableProps): JSX.Element {
   );
   const [sortLastName, setSortLastName] = useState<"asc" | "desc" | null>(null);
 
-  const filteredData = data
+  // States for Deleting
+  const [tableData, setTableData] = useState<TableRowData[]>(data);
+
+  const filteredData = tableData
     .filter((row) =>
       filterTitle ? row.title.toLowerCase() === filterTitle.toLowerCase() : true
     )
@@ -72,24 +75,31 @@ function Table({ data }: TableProps): JSX.Element {
     if (page > 0 && page <= totalPages) setCurrentPage(page);
   };
 
-  // Handle sorting for First Name and Last Name
-  const handleSortFirstName = (direction: "asc" | "desc" | null) => {
-    setSortFirstName(direction);
-    setIsDropdownOpenFirstName(false);
-  };
-
-  const handleSortLastName = (direction: "asc" | "desc" | null) => {
-    setSortLastName(direction);
-    setIsDropdownOpenLastName(false);
-  };
-
+  // Handle sorting for Title
   const handleSortTitle = (title: string | null) => {
     setFilterTitle(title || "");
+    setCurrentPage(1); // Reset to page 1 when a filter is applied
     setIsDropdownOpenTitle(false);
   };
 
+  // Handle sorting for First Name
+  const handleSortFirstName = (direction: "asc" | "desc" | null) => {
+    setSortFirstName(direction);
+    setCurrentPage(1); // Reset to page 1 when a filter is applied
+    setIsDropdownOpenFirstName(false);
+  };
+
+  // Handle sorting for Last Name
+  const handleSortLastName = (direction: "asc" | "desc" | null) => {
+    setSortLastName(direction);
+    setCurrentPage(1); // Reset to page 1 when a filter is applied
+    setIsDropdownOpenLastName(false);
+  };
+
+  // Handle sorting for Hemisphere
   const handleSortHemisphere = (hemisphere: string | null) => {
     setFilterHemisphere(hemisphere || "");
+    setCurrentPage(1); // Reset to page 1 when a filter is applied
     setIsDropdownOpenHemisphere(false);
   };
 
@@ -124,6 +134,10 @@ function Table({ data }: TableProps): JSX.Element {
     ) {
       setIsDropdownOpenHemisphere(false);
     }
+  };
+
+  const handleDeleteRow = (index: number) => {
+    setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
 
   useEffect(() => {
@@ -275,7 +289,7 @@ function Table({ data }: TableProps): JSX.Element {
               <th className="p-2 border" style={{ width: "10%" }}>
                 City
               </th>
-              <th className="p-2 border" style={{ width: "13%" }}>
+              <th className="p-2 border" style={{ width: "15%" }}>
                 Hemisphere
                 <div className="relative inline-block">
                   <button
@@ -327,6 +341,7 @@ function Table({ data }: TableProps): JSX.Element {
                 email={row.email}
                 city={row.city}
                 hemisphere={row.hemisphere}
+                onDelete={() => handleDeleteRow(index)}
               />
             ))}
           </tbody>
