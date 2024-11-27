@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import TableRow from "./TableRow";
-import { FaTrash, FaSort, FaFilter } from "react-icons/fa"; // Import the icons
+import { FaTrash } from "react-icons/fa"; // Import the icons
+import * as XLSX from "xlsx";
 
 type TableRowData = {
   title: string;
@@ -13,9 +14,10 @@ type TableRowData = {
 
 interface TableProps {
   data: TableRowData[];
+  searchQuery: string;
 }
 
-function Table({ data }: TableProps): JSX.Element {
+function Table({ data, searchQuery }: TableProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
   const [isDropdownOpenTitle, setIsDropdownOpenTitle] = useState(false);
@@ -30,6 +32,7 @@ function Table({ data }: TableProps): JSX.Element {
   );
   const [sortLastName, setSortLastName] = useState<"asc" | "desc" | null>(null);
   const [tableData, setTableData] = useState<TableRowData[]>(data);
+
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
     "title",
     "firstName",
@@ -38,6 +41,10 @@ function Table({ data }: TableProps): JSX.Element {
     "city",
     "hemisphere",
   ]);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
 
   const filteredData = tableData
     ? tableData
@@ -155,6 +162,27 @@ function Table({ data }: TableProps): JSX.Element {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const filterDataByVisibleColumns = (
+    data: TableRowData[],
+    visibleColumns: string[]
+  ): any[] => {
+    return data.map((row) => {
+      const filteredRow: any = {};
+      visibleColumns.forEach((col) => {
+        filteredRow[col] = row[col as keyof TableRowData];
+      });
+      return filteredRow;
+    });
+  };
+
+  const exportToExcel = () => {
+    const filteredData = filterDataByVisibleColumns(sortedData, visibleColumns);
+    const ws = XLSX.utils.json_to_sheet(filteredData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, "filtered_data.xlsx");
+  };
 
   return (
     <div className="flex flex-col">
@@ -397,31 +425,39 @@ function Table({ data }: TableProps): JSX.Element {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center items-center absolute bottom-0 space-x-2">
-        <button
-          className="px-2 py-1 border rounded"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          {"<"}
-        </button>
-        {[...Array(totalPages)].map((_, i) => (
+      <div className="flex justify-between items-center relative space-x-2 mt-5">
+        <div className="flex justify-between space-x-2">
           <button
-            key={i}
-            className={`px-2 py-1 border rounded ${
-              currentPage === i + 1 ? "bg-gray-200" : ""
-            }`}
-            onClick={() => handlePageChange(i + 1)}
+            className="px-2 py-1 border rounded"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
-            {i + 1}
+            {"<"}
           </button>
-        ))}
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={`px-2 py-1 border rounded ${
+                currentPage === i + 1 ? "bg-gray-200" : ""
+              }`}
+              onClick={() => handlePageChange(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            className="px-2 py-1 border rounded"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            {">"}
+          </button>
+        </div>
         <button
-          className="px-2 py-1 border rounded"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          className="px-4 py-1 border rounded hover:bg-green-400"
+          onClick={exportToExcel}
         >
-          {">"}
+          Export to Excel
         </button>
       </div>
     </div>

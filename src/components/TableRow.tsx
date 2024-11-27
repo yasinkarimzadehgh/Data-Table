@@ -45,7 +45,7 @@ const TableRow: React.FC<TableRowProps> = ({
       {visibleColumns.includes("hemisphere") && (
         <td className="p-2 border">{hemisphere}</td>
       )}
-      <td className="p-2 border">
+      <td className="p-2 border text-center">
         <button className="text-red-500" onClick={onDelete}>
           <FaTrash />
         </button>
