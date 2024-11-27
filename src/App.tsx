@@ -1,4 +1,3 @@
-import MainNav from "./components/MainNav";
 import Table from "./components/Table";
 import { useState, useEffect } from "react";
 import { dataTable } from "./data/data";
@@ -33,7 +32,8 @@ function App(): JSX.Element {
     <>
       <nav className="flex flex-col items-center border-b mb-5 py-2">
         <div className="max-w-6xl w-full flex justify-between items-center">
-          <MainNav />
+          <p>Test</p>
+
           <input
             type="text"
             placeholder="Search..."
